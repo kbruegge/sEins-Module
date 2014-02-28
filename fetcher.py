@@ -37,7 +37,6 @@ class Fetcher:
         return time.strftime("%H:%M"), time.strftime("%d.%m.%Y")
 
     def get_efa(self, dep, arr, day=None, time=None):
-        
         if day is None or time is None:
             time, day = self.create_time_and_date()
 
@@ -85,26 +84,31 @@ class DBPage:
         return self._errormessages
 
     def _parse_trains_(self):
-        train = {}
+        trains = []
         arrivals = self._soup.select("tr.ovConLine")
         for t in arrivals:
-            self._parse_row(t)
-            print(Fore.BLUE + '----------------------')
-
+            trains.append(self._parse_row(t))
+        s_trains = [el for el in trains if el[2] == 'S' or el[2] == 'S ']
+        print(str(s_trains))
         return True
 
     def _parse_row(self, row):
         #print(str(row))
         cell1 = row.select("td.timelink  a")
+        arr = None
+        delay = None
+        traintype = None
+
         if cell1:
-            print(cell1[0].text)
+            arr = cell1[0].text
         cell2 = row.select("td.tprt  span")
         if cell2:
-            print(cell2[0].text)
+            delay = cell2[0].text
         cell3 = row.select("td.iphonepfeil")
         if cell3:
-            print(cell3[0].text)
+            traintype = cell3[0].text
 
+        return arr, delay, traintype
 
     def print_errors(self):
         for r in self._errormessages:
