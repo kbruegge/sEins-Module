@@ -32,14 +32,14 @@ logger.addHandler(handler)
 
 class HtmlFetcher:
     #take departure and arrival location and optinaly departure day and time
-    def get_efa(self, dep, arr, day=None, departure_time=None):
+    def get_efa_html(self, dep, arr, day=None, departure_time=None):
         raise NotImplementedError
 
 
 class DBHtmlFetcher(HtmlFetcher):
     _url = 'http://mobile.bahn.de/bin/mobil/query2.exe/dox'
 
-    def get_efa(self, dep, arr, day=None, departure_time=None):
+    def get_efa_html(self, dep, arr, day=None, departure_time=None):
         if not day :
             day = time.strftime("%d.%m.%Y")
 
@@ -74,16 +74,26 @@ class DBWebError(Exception):
         self.messages = messages
 
 
-class DBPageParser:
+class PageParser:
     _html = None
     _soup = None
-    _errormessages = []
-    _trains = []
 
     def __init__(self, dep, arr, day=None, departure_time=None):
         fetcher = DBHtmlFetcher()
-        self._html = fetcher.get_efa(departure, arrival, day , departure_time )
+        self._html = fetcher.get_efa_html(departure, arrival, day , departure_time )
         self._soup = BeautifulSoup(self._html)
+
+    @property
+    def connections(self):
+        raise NotImplementedError
+
+
+class DBPageParser(PageParser):
+    _errormessages = []
+    _connections = []
+
+    def __init__(self, dep, arr, day=None, departure_time=None):
+        super().__init__(dep, arr, day, departure_time)
         self._parse_soup()
 
     @classmethod
@@ -94,18 +104,14 @@ class DBPageParser:
 
     @classmethod
     def from_html_fetcher(self, fetcher, dep, arr, day=None, departure_time=None):
-        self._html = fetcher.get_efa(departure, arrival, day , departure_time )
+        self._html = fetcher.get_efa_html(departure, arrival, day , departure_time )
         self._soup = BeautifulSoup(self._html)
         self._parse_soup()
 
-
-    def _parse_soup(self):
-        self._errormessages = self.get_errors()
-        self._trains = self._parse_trains_()
-
-        if self._errormessages:
-            raise DBWebError(self._errormessages)
-
+    #returns a tuple of the form (departuretime, arrivaltime, delay, traintype)
+    @property
+    def connections(self):
+        return self._connections
 
     @property
     def html(self):
@@ -120,12 +126,14 @@ class DBPageParser:
         errortags = self._soup.find_all('div', 'errormsg', text=True)
         return [e.text for e in errortags]
 
-    #returns a tuple of the form (departuretime, arrivaltime, delay, traintype)
-    def get_connections(self, s_bahn_only=False):
-        if s_bahn_only:
-            return [el for el in self._trains if el[3] == 'S' or el[3] == 'S ']
-        else:
-            return self._trains
+
+    def _parse_soup(self):
+        self._errormessages = self.get_errors()
+        self._connections = self._parse_trains_()
+
+        if self._errormessages:
+            raise DBWebError(self._errormessages)
+
 
     def _parse_trains_(self):
         trains = []
@@ -138,6 +146,7 @@ class DBPageParser:
 
     def _parse_row(self, row):
         #print(str(row))
+        dep = None
         arr = None
         delay = None
         traintype = None
@@ -193,7 +202,7 @@ if __name__ == '__main__':
     #fetcher = DBHtmlFetcher()
     #resp = fetcher.get_efa(departure, arrival )
     page = DBPageParser(departure, arrival)
-    print(page.get_connections())
+    print(page.connections)
 
     if output_path:
         with open(output_path, 'wt') as file:
