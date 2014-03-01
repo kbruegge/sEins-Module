@@ -10,7 +10,8 @@ from bs4 import BeautifulSoup
 import time
 
 from colorama import init, Fore, Style
-#init colorama so it works on windows as well. The autoreset flag keeps me from using RESET on each line I want to color
+#init colorama so it works on windows as well.
+#The autoreset flag keeps me from using RESET on each line I want to color
 init(autoreset=True)
 
 import logging
@@ -67,9 +68,11 @@ class DBHtmlFetcher(HtmlFetcher):
         logger.debug(r.text)
         return r.text
 
+
 class DBWebError(Exception):
     def __init__(self, messages):
         self.messages = messages
+
 
 class DBPageParser:
     _html = None
@@ -77,15 +80,36 @@ class DBPageParser:
     _errormessages = []
     _trains = []
 
-    def __init__(self, html):
+    def __init__(self, dep, arr, day=None, departure_time=None):
+        fetcher = DBHtmlFetcher()
+        self._html = fetcher.get_efa(departure, arrival, day , departure_time )
+        self._soup = BeautifulSoup(self._html)
+        self._parse_soup()
+
+    @classmethod
+    def from_html(self, html):
         self._html = html
-        self._soup = BeautifulSoup(html)
-        logger.debug(self._soup.prettify())
+        self._soup = BeautifulSoup(self._html)
+        self._parse_soup()
+
+    @classmethod
+    def from_html_fetcher(self, fetcher, dep, arr, day=None, departure_time=None):
+        self._html = fetcher.get_efa(departure, arrival, day , departure_time )
+        self._soup = BeautifulSoup(self._html)
+        self._parse_soup()
+
+
+    def _parse_soup(self):
         self._errormessages = self.get_errors()
         self._trains = self._parse_trains_()
 
         if self._errormessages:
             raise DBWebError(self._errormessages)
+
+
+    @property
+    def html(self):
+        return self._html
 
     #returns a list of strings hopefully containng meaningfull erromessages from the webpage we parsed
     def get_errors(self):
@@ -166,17 +190,14 @@ def parse_args():
 if __name__ == '__main__':
 
     (output_path, departure, arrival) = parse_args()
-    fetcher = DBHtmlFetcher()
-    resp = fetcher.get_efa(departure, arrival )
-    page = DBPageParser(resp)
+    #fetcher = DBHtmlFetcher()
+    #resp = fetcher.get_efa(departure, arrival )
+    page = DBPageParser(departure, arrival)
     print(page.get_connections())
 
-    if output_path is None:
-        logger.info('REsponse from server was: ')
-        print(resp)
-    else:
+    if output_path:
         with open(output_path, 'wt') as file:
-            file.write(resp)
+            file.write(page.html)
             logger.info(Fore.GREEN + "Output written to " + output_path)
 
 
