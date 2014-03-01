@@ -65,9 +65,11 @@ if __name__ == '__main__':
     #fetcher = DBHtmlFetcher()
     #resp = fetcher.get_efa(departure, arrival )
     page = DBPageParser(departure, arrival)
-    print(page.connections)
-
+    #do some pretty printing
+    print('------------ Connections from:' + departure + '  to: ' + arrival)
+    for c in page.connections:
+        print(c)
     if output_path:
         with open(output_path, 'wt') as file:
             file.write(page.html)
-            logger.info(Fore.GREEN + "Output written to " + output_path)
+            logger.info("Output written to " + output_path)

@@ -3,7 +3,7 @@ import time
 import requests
 import logging
 
-logger = logging.getLogger('root')
+logger = logging.getLogger(__name__)
 
 
 class HtmlFetcher:
@@ -41,5 +41,4 @@ class DBHtmlFetcher(HtmlFetcher):
                    'start': 'Suchen'}
 
         r = requests.post(self._url, data=payload)
-        logger.debug(r.text)
         return r.text
