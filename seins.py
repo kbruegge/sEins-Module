@@ -1,13 +1,12 @@
+#! /usr/bin/python3
 # -*- coding: utf-8 -*-
 __author__ = 'mackaiver'
 
 #Lets start with a simple commandline tool
 import argparse
 import os
-import sys
 from seins.PageParser import DBPageParser, PageContentError
 from seins.HtmlFetcher import FetcherException
-import requests.exceptions
 
 from colorama import init, Fore, Style
 #init colorama so it works on windows as well.
@@ -60,8 +59,7 @@ def parse_args():
     return args.o, args.d, args.a, args.s
 
 
-if __name__ == '__main__':
-
+def main():
     (output_path, departure, arrival, sbahn_only) = parse_args()
     connections = []
 
@@ -91,3 +89,8 @@ if __name__ == '__main__':
             print(d + ',    ' + a + ',    ' + Fore.RED + delay + Fore.RESET + ',    ' + t)
         else:
             print(d + ',    ' + a + ',    ' + str(delay) + ',    ' + t)
+
+
+if __name__ == '__main__':
+    main()
+
