@@ -64,8 +64,7 @@ class DBPageParser(PageParser):
         if self._errormessages:
             return self._errormessages
 
-        #find all div tags with class erromsg that have some text
-        errortags = self._soup.find_all('div', 'errormsg', text=True)
+        errortags = self._soup.find_all("div", {"class": "fline errormsg"})
         logger.debug('Error tags:  ' + str(errortags))
         self._errormessages = [e.text for e in errortags]
         return self._errormessages
