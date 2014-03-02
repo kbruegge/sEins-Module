@@ -48,6 +48,7 @@ def parse_args():
 
     p.add_argument('-o', metavar='--output', type=lambda path: is_valid_file(p, path), help='path to outputfile')
     p.add_argument('-v', action="store_true", help='Show some nice debug and info logging output')
+    p.add_argument('-s', action="store_true", help='only display S-Bahn connections')
 
     args = p.parse_args()
     #check for debug logging
@@ -56,12 +57,12 @@ def parse_args():
     else:
         logging.basicConfig(level=logging.WARN)
 
-    return args.o, args.d, args.a
+    return args.o, args.d, args.a, args.s
 
 
 if __name__ == '__main__':
 
-    (output_path, departure, arrival) = parse_args()
+    (output_path, departure, arrival, sbahn_only) = parse_args()
     connections = []
 
     try:
@@ -78,6 +79,15 @@ if __name__ == '__main__':
         logger.error('Fetcher could not get valid response from server: ' + str(e))
 
     #do some pretty printing
-    print('------------ Connections from:' + departure + '  to: ' + arrival)
-    for c in connections:
-        print(c)
+    print('------------ Connections from: ' + Style.BRIGHT + departure + Style.RESET_ALL +
+          '  to: ' + Style.BRIGHT + arrival)
+
+    print(' departure, arrival, delay, connection')
+    for (d, a, delay, t) in connections:
+        if sbahn_only and not t.strip() is 'S':
+            continue
+
+        if delay and int(delay) >= 5:
+            print(d + ',    ' + a + ',    ' + Fore.RED + delay + Fore.RESET + ',    ' + t)
+        else:
+            print(d + ',    ' + a + ',    ' + str(delay) + ',    ' + t)
