@@ -2,9 +2,12 @@ __author__ = 'mackaiver'
 
 from bs4 import BeautifulSoup
 from seins.HtmlFetcher import DBHtmlFetcher
+import logging
+
+logger = logging.getLogger(__name__)
 
 
-class DBWebError(Exception):
+class PageContentError(Exception):
     def __init__(self, messages):
         self.messages = messages
 
@@ -22,6 +25,10 @@ class PageParser:
     def connections(self):
         raise NotImplementedError
 
+    @property
+    def errors(self):
+        raise NotImplementedError
+
 
 class DBPageParser(PageParser):
     _errormessages = []
@@ -29,48 +36,48 @@ class DBPageParser(PageParser):
 
     def __init__(self, dep, arr, day=None, departure_time=None):
         super().__init__(dep, arr, day, departure_time)
-        self._parse_soup()
 
     @classmethod
     def from_html(cls, html):
         cls._html = html
         cls._soup = BeautifulSoup(cls._html)
-        cls._parse_soup()
 
     @classmethod
     def from_html_fetcher(cls, fetcher, dep, arr, day=None, departure_time=None):
         cls._html = fetcher.get_efa_html(dep, arr, day, departure_time)
         cls._soup = BeautifulSoup(cls._html)
-        cls._parse_soup()
 
     #returns a tuple of the form (departuretime, arrivaltime, delay, traintype)
     @property
     def connections(self):
+        if self.errors:
+            raise PageContentError(self.errors)
+
+        if not self._connections:
+            self._connections = self._parse_trains_()
+
         return self._connections
+
+    #returns a list of strings hopefully containing meaningfull erromessages from the webpage we parsed
+    @property
+    def errors(self):
+        if self._errormessages:
+            return self._errormessages
+
+        #find all div tags with class erromsg that have some text
+        errortags = self._soup.find_all('div', 'errormsg', text=True)
+        logger.debug('Error tags:  ' + str(errortags))
+        self._errormessages = [e.text for e in errortags]
+        return self._errormessages
 
     @property
     def html(self):
         return self._html
 
-    #returns a list of strings hopefully containng meaningfull erromessages from the webpage we parsed
-    def get_errors(self):
-        if self._errormessages:
-            return self._errormessages
-
-        #find all div tags with class erromsg that have soem text
-        errortags = self._soup.find_all('div', 'errormsg', text=True)
-        return [e.text for e in errortags]
-
-    def _parse_soup(self):
-        self._errormessages = self.get_errors()
-        self._connections = self._parse_trains_()
-
-        if self._errormessages:
-            raise DBWebError(self._errormessages)
-
     def _parse_trains_(self):
         trains = []
         arrivals = self._soup.select("tr.ovConLine")
+        logger.debug('table rows with trains:  ' + str(arrivals))
 
         for t in arrivals:
             trains.append(self._parse_row(t))

@@ -1,9 +1,15 @@
 __author__ = 'mackaiver'
 import time
 import requests
+import requests.exceptions
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+class FetcherException(Exception):
+    def __init__(self, messages):
+        self.messages = messages
 
 
 class HtmlFetcher:
@@ -39,6 +45,14 @@ class DBHtmlFetcher(HtmlFetcher):
                    'immediateAvail': 'ON',
                    'queryPageDisplayed': 'yes',
                    'start': 'Suchen'}
+        try:
+            r = requests.post(self._url, data=payload)
+            if not r.text:
+                logger.debug('Response text is empty.')
+                raise FetcherException('Response text is empty.')
 
-        r = requests.post(self._url, data=payload)
-        return r.text
+            return r.text
+
+        except requests.exceptions.RequestException as e:
+            logger.debug('RequestException ' + str(e))
+            raise FetcherException(str(e))
