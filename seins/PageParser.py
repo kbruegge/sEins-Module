@@ -1,8 +1,11 @@
 __author__ = 'mackaiver'
 
-from bs4 import BeautifulSoup
-from seins.HtmlFetcher import DBHtmlFetcher
 import logging
+
+from bs4 import BeautifulSoup
+
+from seins.HtmlFetcher import DBHtmlFetcher
+
 
 logger = logging.getLogger(__name__)
 
