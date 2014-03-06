@@ -5,10 +5,12 @@ __author__ = 'mackaiver'
 #Lets start with a simple commandline tool
 import argparse
 import os
+
+from colorama import init, Fore, Style
+
 from seins.PageParser import DBPageParser, PageContentError
 from seins.HtmlFetcher import FetcherException
 
-from colorama import init, Fore, Style
 #init colorama so it works on windows as well.
 #The autoreset flag keeps me from using RESET on each line I want to color
 init(autoreset=True)
