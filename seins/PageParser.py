@@ -15,7 +15,7 @@ class PageContentError(Exception):
         self.messages = messages
 
 
-class PageParser:
+class PageParser(object):
     _html = None
     _soup = None
 
@@ -38,7 +38,7 @@ class DBPageParser(PageParser):
     _connections = []
 
     def __init__(self, dep, arr, day=None, departure_time=None):
-        super().__init__(dep, arr, day, departure_time)
+        super(DBPageParser, self).__init__(dep, arr, day, departure_time)
 
     @classmethod
     def from_html(cls, html):
