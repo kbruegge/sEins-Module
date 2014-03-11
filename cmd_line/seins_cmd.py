@@ -47,8 +47,11 @@ def parse_args():
     p.add_argument('-a', default='Dortmund hbf', metavar='--arrival_station', type=str,
                    help='Name of the arrival station')
 
-    p.add_argument('-o', metavar='--output', type=lambda path: is_valid_file(p, path), help='path to outputfile')
-    p.add_argument('-v', action="store_true", help='Show some nice debug and info logging output')
+    p.add_argument('-o', metavar='--output', type=lambda path: is_valid_file(p, path), help='will write the html '
+                                                                                            'fetched from the dbwebsite'
+                                                                                            ' to the given path')
+
+    p.add_argument('-v', action="store_true", help='Show some debug and info logging output')
     p.add_argument('-s', action="store_true", help='only display S-Bahn connections')
 
     args = p.parse_args()
@@ -79,7 +82,7 @@ def main():
         logger.error('Fetcher could not get valid response from server: ' + str(e))
 
     #do some pretty printing
-    print('------------ Connections from: ' + Style.BRIGHT + departure + Style.RESET_ALL +
+    print('Connections from: ' + Style.BRIGHT + departure + Style.RESET_ALL +
           '  to: ' + Style.BRIGHT + arrival)
 
     print(' departure, arrival, delay, connection')
