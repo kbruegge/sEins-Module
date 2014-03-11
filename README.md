@@ -2,13 +2,14 @@ sEins
 ============
 
 A small module for fetching and parsing stuff from EFA on the DBWebsite. Also provides command line utility
-so you can quickly see if your train is on time or not
+so you can quickly see if your train is on time or not. I wrote this with python 3.3+ in mind but it also runs on 2.7+
+on my machine.
 
 
 Command Line Usage
 -------------
 
-After doing `pip3 install sein` you can use the command line tool called `seins` or just `s1`. The output will look
+After doing `pip install seins` you can use the command line tool called `seins` or just `s1`. The output will look
 somewhat like this:
 
     $ s1
