@@ -19,7 +19,7 @@ class HtmlFetcher:
 
 
 class DBHtmlFetcher(HtmlFetcher):
-    _url = 'http://mobile.bahn.de/bin/mobil/query2.exe/dox'
+    _url = 'https://mobile.bahn.de/bin/mobil/query.exe/dox'
 
     def get_efa_html(self, dep, arr, day=None, departure_time=None):
         if not day:
