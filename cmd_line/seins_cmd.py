@@ -5,6 +5,7 @@ __author__ = 'mackaiver'
 #Lets start with a simple commandline tool
 import argparse
 import os
+import datetime
 
 from colorama import init, Fore, Style
 
@@ -85,15 +86,25 @@ def main():
     print('Connections from: ' + Style.BRIGHT + departure + Style.RESET_ALL +
           '  to: ' + Style.BRIGHT + arrival)
 
-    print(' departure, arrival, delay, connection')
-    for (d, a, delay, t) in connections:
+    print('Dep.    Est. Dep.    Arr.    Conn.')
+    for (planned_departure, arrival, estimated_departure, t) in connections:
         if sbahn_only and not t.strip() is 'S':
             continue
 
-        if delay and int(delay) >= 5:
-            print(d + ',    ' + a + ',    ' + Fore.RED + delay + Fore.RESET + ',    ' + t)
+        if estimated_departure:
+            # calculate the delay
+            estimated_time = datetime.datetime(1970, 1, 1, *(int(i) for i in estimated_departure.split(':')))
+            planned_time = datetime.datetime(1970, 1, 1, *(int(i) for i in planned_departure.split(':')))
+            delay = estimated_time - planned_time
+            if delay.days < 0 and delay.seconds > 300:
+                color_start = Fore.RED
+            else:
+                color_start = Fore.GREEN
+            color_stop = Fore.RESET
         else:
-            print(d + ',    ' + a + ',    ' + str(delay) + ',    ' + t)
+            color_start = color_stop = estimated_departure = ''
+
+        print(f'{planned_departure: <7} {color_start}{estimated_departure: <12}{color_stop} {arrival: <7} {t}')
 
 
 if __name__ == '__main__':
