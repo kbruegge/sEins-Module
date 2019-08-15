@@ -4,12 +4,12 @@ from setuptools import find_packages
 setup(
     name = 'seins',
     packages=find_packages(),
-    version = '0.3.1',
+    version = '0.3.2',
     description='A  small module and  command line utility to show you when the '
                 'next train to your desired location is arriving by parsing the DB website',
     author = 'Kai',
     author_email = 'kai@woistbier.de',
-    install_requires = [ 'colorama', 'requests', ' beautifulsoup4' ],
+    install_requires = [ 'colorama', 'requests', ' beautifulsoup4', 'lxml' ],
     url = 'https://github.com/mackaiver/sEins-Server',   # use the URL to the github repo
     download_url='https://github.com/mackaiver/sEins-Server/archive/master.zip',
     keywords=['traffic', 'scrapping', 'utility', 'transportation', 's1', 'DB'],
