@@ -1,12 +1,16 @@
 from setuptools import setup
 from setuptools import find_packages
 
+with open('README.md') as f:
+    long_description = f.read()
+
 setup(
     name = 'seins',
     packages=find_packages(),
     version = '0.3.2',
     description='A  small module and  command line utility to show you when the '
                 'next train to your desired location is arriving by parsing the DB website',
+    long_description = long_description,
     author = 'Kai',
     author_email = 'kai@woistbier.de',
     install_requires = [ 'colorama', 'requests', ' beautifulsoup4', 'lxml' ],
