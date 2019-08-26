@@ -10,8 +10,8 @@ setup(
     author = 'Kai',
     author_email = 'kai@woistbier.de',
     install_requires = [ 'colorama', 'requests', ' beautifulsoup4', 'lxml' ],
-    url = 'https://github.com/mackaiver/sEins-Server',   # use the URL to the github repo
-    download_url='https://github.com/mackaiver/sEins-Server/archive/master.zip',
+    url = 'https://github.com/kbruegge/sEins-Server',   # use the URL to the github repo
+    download_url='https://github.com/kbruegge/sEins-Server/archive/master.zip',
     keywords=['traffic', 'scrapping', 'utility', 'transportation', 's1', 'DB'],
     license = 'MIT',
     classifiers = [
